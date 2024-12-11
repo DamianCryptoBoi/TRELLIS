@@ -76,7 +76,7 @@ def image_to_3d(prompt: str, image: Image.Image, ss_guidance_strength: float = 7
         },
     )
     ply_path = f"./tmp/{seed}.ply"
-    outputs['gaussian'][0].save_ply()
+    outputs['gaussian'][0].save_ply(ply_path)
     print("Ply file saved at:", ply_path)
     #read the ply file
     with open(ply_path, "rb") as f:
