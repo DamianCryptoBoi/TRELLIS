@@ -26,7 +26,7 @@ client = Together()
 MAX_SEED = np.iinfo(np.int32).max
 
 app = FastAPI()
-os.mkdir("tmp", exist_ok=True)
+os.makedirs("/tmp", exist_ok=True)
 
 def generate_image(prompt: str):
     start_time = time.time()
