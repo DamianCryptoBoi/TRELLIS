@@ -75,7 +75,7 @@ def image_to_3d(prompt: str, image: Image.Image, ss_guidance_strength: float = 7
             "cfg_strength": slat_guidance_strength,
         },
     )
-    ply_path = outputs['gaussian'][0].save_ply(f"./tmp/{seed}_{prompt}.ply")
+    ply_path = outputs['gaussian'][0].save_ply(f"./{seed}_{prompt}.ply")
     #read the ply file
     with open(ply_path, "rb") as f:
         buffer = f.read()
