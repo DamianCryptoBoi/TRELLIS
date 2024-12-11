@@ -12,7 +12,7 @@ from PIL import Image
 from trellis.pipelines import TrellisImageTo3DPipeline
 from trellis.representations import Gaussian, MeshExtractResult
 from trellis.utils import render_utils, postprocessing_utils
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File,Form
 from fastapi.responses import JSONResponse
 import uvicorn
 from together import Together
@@ -90,7 +90,7 @@ def image_to_3d(prompt: str, image: Image.Image, ss_guidance_strength: float = 7
     return score
 
 @app.post("/test")
-async def generate(prompt: str):
+async def generate(prompt: str = Form()):
     b64_json = generate_image(prompt)
     image_data = base64.b64decode(b64_json)
     image = Image.open(BytesIO(image_data))
