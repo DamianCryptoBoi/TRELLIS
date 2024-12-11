@@ -11,5 +11,3 @@ imageCompletion = client.images.generate(
 )
 
 print(imageCompletion.data[0].url)
-
-# 624701db8f84649fca7eb5ad56ed82aaa07a852d1e904ef5d2d9ef1da1434915
