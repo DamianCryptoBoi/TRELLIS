@@ -30,12 +30,12 @@ os.makedirs("/tmp", exist_ok=True)
 
 def generate_image(prompt: str):
     start_time = time.time()
-    prompt = f"extremely detailed and colorful 3d {prompt}, black background"
+    prompt = f"highly detailed 3d model of {prompt}, black background"
     image = client.images.generate(
-        model="black-forest-labs/FLUX.1-dev",
+        model="black-forest-labs/FLUX.1-schnell",
         width=1024,
         height=1024,
-        steps=28,
+        steps=4,
         prompt=prompt,
         response_format="b64_json"
     )
