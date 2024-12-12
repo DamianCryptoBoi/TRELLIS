@@ -33,7 +33,7 @@ for prompt in prompts:
         total_score+=score
         print(f"score: {score}")
         print(f"Average score: {total_score/total_runs}")
-        if score > 0.6:
+        if score > 0.68:
             pass_count += 1
             final_score += 0.75
             if score > 0.8:

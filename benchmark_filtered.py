@@ -27,7 +27,7 @@ for prompt in prompts:
         }, timeout=600)
         score = float(gen_response.text)
         print(f"score: {score}")
-        if score > 0.6:
+        if score > 0.68:
             pass_count += 1
             final_score += 0.75
             if score > 0.8:
