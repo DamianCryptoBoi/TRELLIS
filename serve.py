@@ -30,12 +30,12 @@ os.makedirs("/tmp", exist_ok=True)
 
 def generate_image(prompt: str):
     start_time = time.time()
-    prompt = f"3d model of a {prompt}, white background"
+    prompt = f"extremely detailed and colorful 3d {prompt}, black background"
     image = client.images.generate(
-        model="black-forest-labs/FLUX.1-schnell-Free",
+        model="black-forest-labs/FLUX.1-dev",
         width=1024,
         height=1024,
-        steps=4,
+        steps=28,
         prompt=prompt,
         response_format="b64_json"
     )
@@ -58,7 +58,7 @@ def pack_state(gs: Gaussian) -> dict:
     }
 
 
-def image_to_3d(prompt: str, image: Image.Image, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
+def image_to_3d(prompt: str, image: Image.Image, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 30, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
     start_time = time.time()
     seed = np.random.randint(0, MAX_SEED)
     outputs = pipeline.run(
