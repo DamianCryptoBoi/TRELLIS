@@ -93,7 +93,7 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
     start_time = time.time()
     count = 0
 
-    while count < 3:
+    while count < 10:
         seed = np.random.randint(0, MAX_SEED)
         outputs = pipeline.run(
             image,
@@ -119,6 +119,7 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
         response = requests.post("http://localhost:8094/validate_ply/", json={"prompt": prompt, "data": buffer})
         end_time = time.time()
         score = response.json().get("score", 0)
+        print("prompt:", prompt)
         print(response.json())
         print("Time taken to convert image to 3D:", end_time - start_time)
         # remove the ply file
