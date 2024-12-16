@@ -1,12 +1,8 @@
-import gradio as gr
-from gradio_litmodel3d import LitModel3D
+
 
 import os
 from typing import *
-import torch
 import numpy as np
-import imageio
-import uuid
 from easydict import EasyDict as edict
 from PIL import Image
 from trellis.pipelines import TrellisImageTo3DPipeline
@@ -20,6 +16,8 @@ import time
 import base64
 from io import BytesIO
 import requests
+from pydantic import BaseModel
+from fastapi.responses import Response, StreamingResponse
 
 client = Together()
 
@@ -58,7 +56,7 @@ def pack_state(gs: Gaussian) -> dict:
     }
 
 
-def image_to_3d(prompt: str, image: Image.Image, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
+def image_to_3d_test(prompt: str, image: Image.Image, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
     start_time = time.time()
     seed = np.random.randint(0, MAX_SEED)
     outputs = pipeline.run(
@@ -91,13 +89,64 @@ def image_to_3d(prompt: str, image: Image.Image, ss_guidance_strength: float = 7
     os.remove(ply_path)
     return score
 
+def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.68, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
+    start_time = time.time()
+    count = 0
+
+    while count < 3:
+        seed = np.random.randint(0, MAX_SEED)
+        outputs = pipeline.run(
+            image,
+            seed=seed,
+            formats=["gaussian"],
+            preprocess_image=True,
+            sparse_structure_sampler_params={
+                "steps": ss_sampling_steps,
+                "cfg_strength": ss_guidance_strength,
+            },
+            slat_sampler_params={
+                "steps": slat_sampling_steps,
+                "cfg_strength": slat_guidance_strength,
+            },
+        )
+        ply_path = f"./gen-data/{seed}.ply"
+        outputs['gaussian'][0].save_ply(ply_path)
+        print("Ply file saved at:", ply_path)
+        #read the ply file
+        with open(ply_path, "rb") as f:
+            buffer = f.read()
+        buffer = base64.b64encode(buffer).decode("utf-8")
+        response = requests.post("http://localhost:8094/validate_ply/", json={"prompt": prompt, "data": buffer})
+        end_time = time.time()
+        score = response.json().get("score", 0)
+        print(response.json())
+        print("Time taken to convert image to 3D:", end_time - start_time)
+        # remove the ply file
+        os.remove(ply_path)
+        if score >= validation_threshold:
+            return buffer
+        count += 1
+    return ''
+
 @app.post("/test")
-async def generate(prompt: str = Form()):
+async def test(prompt: str = Form()):
     b64_json = generate_image(prompt)
     image_data = base64.b64decode(b64_json)
     image = Image.open(BytesIO(image_data))
-    state = image_to_3d(prompt, image)
+    state = image_to_3d_test(prompt, image)
     return JSONResponse(content=state)
+
+class GenerateRequest(BaseModel):
+    prompt: str
+    validation_threshold: float = 0.68
+
+@app.post("/generate/")
+async def generate(req: GenerateRequest):
+    b64_json = generate_image(req.prompt)
+    image_data = base64.b64decode(b64_json)
+    image = Image.open(BytesIO(image_data))
+    buffer = image_to_3d(req.prompt, image, req.validation_threshold)
+    return Response(buffer, media_type="application/octet-stream")
 
 # Launch the Gradio app
 if __name__ == "__main__":
