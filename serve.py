@@ -93,7 +93,7 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
     start_time = time.time()
     count = 0
 
-    while count < 10:
+    while count < 1:
         seed = np.random.randint(0, MAX_SEED)
         outputs = pipeline.run(
             image,
