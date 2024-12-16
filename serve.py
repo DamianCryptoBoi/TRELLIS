@@ -136,16 +136,13 @@ async def test(prompt: str = Form()):
     state = image_to_3d_test(prompt, image)
     return JSONResponse(content=state)
 
-class GenerateRequest(BaseModel):
-    prompt: str
-    validation_threshold: float = 0.68
 
 @app.post("/generate/")
-async def generate(req: GenerateRequest):
-    b64_json = generate_image(req.prompt)
+async def generate(prompt: str = Form(), validation_threshold: float = 0.68):
+    b64_json = generate_image(prompt)
     image_data = base64.b64decode(b64_json)
     image = Image.open(BytesIO(image_data))
-    buffer = image_to_3d(req.prompt, image, req.validation_threshold)
+    buffer = image_to_3d(prompt, image, validation_threshold)
     return Response(buffer, media_type="application/octet-stream")
 
 # Launch the Gradio app
