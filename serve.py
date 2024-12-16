@@ -18,8 +18,10 @@ from io import BytesIO
 import requests
 from pydantic import BaseModel
 from fastapi.responses import Response, StreamingResponse
+from openai import OpenAI
 
-client = Together()
+# client = Together()
+client = OpenAI()
 
 MAX_SEED = np.iinfo(np.int32).max
 
