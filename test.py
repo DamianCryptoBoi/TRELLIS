@@ -5,7 +5,10 @@ from io import BytesIO
 from PIL import Image
 import time
 
-client = Together()
+# client = Together()
+from openai import OpenAI
+import time
+client = OpenAI()
 
 def generate_image(prompt: str):
     start = time.time()
