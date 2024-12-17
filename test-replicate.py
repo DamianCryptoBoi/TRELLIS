@@ -28,7 +28,7 @@ def generate_image(prompt: str):
     "recraft-ai/recraft-20b",
     input={
         "size": "1024x1024",
-        "style": "digital_illustration/3d",
+        "style": "realistic_image",
         "prompt": prompt
         }
     )
