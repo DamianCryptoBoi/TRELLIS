@@ -54,7 +54,7 @@ def generate_image(prompt: str):
             "megapixels": "1",
             "num_outputs": 1,
             "aspect_ratio": "1:1",
-            "output_format": "webp",
+            "output_format": "png",
             "output_quality": 80,
             "prompt_strength": 0.8,
             "num_inference_steps": 28
