@@ -45,22 +45,37 @@ def generate_image(prompt: str):
     # print("Time taken to generate image:", end_time - start_time)
     # return image.data[0].b64_json
 
+    # output = replicate.run(
+    #     "black-forest-labs/flux-dev",
+    #     input={
+    #         "prompt": prompt,
+    #         "go_fast": True,
+    #         "guidance": 3.5,
+    #         "megapixels": "1",
+    #         "num_outputs": 1,
+    #         "aspect_ratio": "1:1",
+    #         "output_format": "webp",
+    #         "output_quality": 80,
+    #         "prompt_strength": 0.8,
+    #         "num_inference_steps": 28
+    #     }
+    # )
+    # image_url = output[0]
+    # response = requests.get(image_url)
+    # image = Image.open(BytesIO(response.content))
+    # end_time = time.time()
+    # print("Time taken to generate image:", end_time - start_time)
+    # return image
+
     output = replicate.run(
-        "black-forest-labs/flux-dev",
-        input={
-            "prompt": prompt,
-            "go_fast": True,
-            "guidance": 3.5,
-            "megapixels": "1",
-            "num_outputs": 1,
-            "aspect_ratio": "1:1",
-            "output_format": "webp",
-            "output_quality": 80,
-            "prompt_strength": 0.8,
-            "num_inference_steps": 28
+    "recraft-ai/recraft-20b",
+    input={
+        "size": "1024x1024",
+        "style": "digital_illustration/3d",
+        "prompt": prompt
         }
     )
-    image_url = output[0]
+    image_url = output
     response = requests.get(image_url)
     image = Image.open(BytesIO(response.content))
     end_time = time.time()
