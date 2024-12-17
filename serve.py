@@ -54,7 +54,7 @@ def generate_image(prompt: str):
             "megapixels": "1",
             "num_outputs": 1,
             "aspect_ratio": "1:1",
-            "output_format": "png",
+            "output_format": "webp",
             "output_quality": 80,
             "prompt_strength": 0.8,
             "num_inference_steps": 28
@@ -156,9 +156,10 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
 
 @app.post("/test")
 async def test(prompt: str = Form()):
-    b64_json = generate_image(prompt)
-    image_data = base64.b64decode(b64_json)
-    image = Image.open(BytesIO(image_data))
+    # b64_json = generate_image(prompt)
+    # image_data = base64.b64decode(b64_json)
+    # image = Image.open(BytesIO(image_data))
+    image = generate_image(prompt)
     state = image_to_3d_test(prompt, image)
     return JSONResponse(content=state)
 
