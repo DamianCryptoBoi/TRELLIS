@@ -18,8 +18,9 @@ from io import BytesIO
 import requests
 from pydantic import BaseModel
 from fastapi.responses import Response, StreamingResponse
+import replicate
 
-client = Together()
+# client = Together()
 
 MAX_SEED = np.iinfo(np.int32).max
 
@@ -28,20 +29,43 @@ os.makedirs("/tmp", exist_ok=True)
 
 def generate_image(prompt: str):
     start_time = time.time()
-    prompt = f"highly detailed and colorful 3d model of a {prompt}, white background"
-    image = client.images.generate(
-        model="black-forest-labs/FLUX.1-schnell-Free",
-        width=1024,
-        height=1024,
-        steps=4,
-        prompt=prompt,
-        response_format="b64_json"
-    )
-    end_time = time.time()
+    prompt = f"{prompt}, white background"
+    # prompt = f"highly detailed and colorful 3d model of a {prompt}, white background"
+    # image = client.images.generate(
+    #     model="black-forest-labs/FLUX.1-schnell-Free",
+    #     width=1024,
+    #     height=1024,
+    #     steps=4,
+    #     prompt=prompt,
+    #     response_format="b64_json"
+    # )
+    # end_time = time.time()
     
-    print("Prompt:", prompt)
+    # print("Prompt:", prompt)
+    # print("Time taken to generate image:", end_time - start_time)
+    # return image.data[0].b64_json
+
+    output = replicate.run(
+        "black-forest-labs/flux-dev",
+        input={
+            "prompt": prompt,
+            "go_fast": True,
+            "guidance": 3.5,
+            "megapixels": "1",
+            "num_outputs": 1,
+            "aspect_ratio": "1:1",
+            "output_format": "webp",
+            "output_quality": 80,
+            "prompt_strength": 0.8,
+            "num_inference_steps": 28
+        }
+    )
+    image_url = output[0]
+    response = requests.get(image_url)
+    image = Image.open(BytesIO(response.content))
+    end_time = time.time()
     print("Time taken to generate image:", end_time - start_time)
-    return image.data[0].b64_json
+    return image
 
 def pack_state(gs: Gaussian) -> dict:
     return {
