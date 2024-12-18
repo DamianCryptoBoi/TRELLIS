@@ -104,7 +104,7 @@ case $PLATFORM in
 esac
 
 if [ "$BASIC" = true ] ; then
-    pip install pillow imageio imageio-ffmpeg tqdm easydict opencv-python-headless scipy ninja rembg onnxruntime trimesh xatlas pyvista pymeshfix igraph transformers
+    pip install pillow imageio imageio-ffmpeg tqdm easydict opencv-python-headless scipy ninja rembg onnxruntime trimesh xatlas pyvista pymeshfix igraph transformers together
     pip install git+https://github.com/EasternJournalist/utils3d.git@9a4eb15e4021b67b12c460c7057d642626897ec8
 fi
 
@@ -248,3 +248,73 @@ fi
 if [ "$DEMO" = true ] ; then
     pip install gradio==4.44.1 gradio_litmodel3d==0.0.1
 fi
+
+echo "Setup complete!"
+
+CONDA_INTERPRETER_PATH=$(which python)
+
+cat <<EOF > generation0.config.js
+module.exports = {
+  apps : [{
+    name: 'generation0',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8093',
+    env: {
+        CUDA_VISIBLE_DEVICES: "0"
+    }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation0.config.js generated for PM2."
+
+cat <<EOF > generation1.config.js
+module.exports = {
+  apps : [{
+    name: 'generation1',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8193',
+    env: {
+        CUDA_VISIBLE_DEVICES: "1"
+      }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation1.config.js generated for PM2."
+
+
+cat <<EOF > generation2.config.js
+module.exports = {
+  apps : [{
+    name: 'generation2',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8293',
+    env: {
+        CUDA_VISIBLE_DEVICES: "2"
+      }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation2.config.js generated for PM2."
+
+
+cat <<EOF > generation3.config.js
+module.exports = {
+  apps : [{
+    name: 'generation3',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8393',
+    env: {
+        CUDA_VISIBLE_DEVICES: "3"
+      }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation3.config.js generated for PM2."
