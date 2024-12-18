@@ -253,7 +253,7 @@ echo "Setup complete!"
 
 CONDA_INTERPRETER_PATH=$(which python)
 
-cat <<EOF > generation0.config.js
+cat <<EOF > generation.config.js
 module.exports = {
   apps : [{
     name: 'generation0',
@@ -263,15 +263,8 @@ module.exports = {
     env: {
         CUDA_VISIBLE_DEVICES: "0"
     }
-  }]
-};
-EOF
-
-echo -e "\n\n[INFO] generation0.config.js generated for PM2."
-
-cat <<EOF > generation1.config.js
-module.exports = {
-  apps : [{
+  },
+  {
     name: 'generation1',
     script: 'serve.py',
     interpreter: '${CONDA_INTERPRETER_PATH}',
@@ -279,16 +272,7 @@ module.exports = {
     env: {
         CUDA_VISIBLE_DEVICES: "1"
       }
-  }]
-};
-EOF
-
-echo -e "\n\n[INFO] generation1.config.js generated for PM2."
-
-
-cat <<EOF > generation2.config.js
-module.exports = {
-  apps : [{
+  },{
     name: 'generation2',
     script: 'serve.py',
     interpreter: '${CONDA_INTERPRETER_PATH}',
@@ -299,22 +283,3 @@ module.exports = {
   }]
 };
 EOF
-
-echo -e "\n\n[INFO] generation2.config.js generated for PM2."
-
-
-cat <<EOF > generation3.config.js
-module.exports = {
-  apps : [{
-    name: 'generation3',
-    script: 'serve.py',
-    interpreter: '${CONDA_INTERPRETER_PATH}',
-    args: '--port 8393',
-    env: {
-        CUDA_VISIBLE_DEVICES: "3"
-      }
-  }]
-};
-EOF
-
-echo -e "\n\n[INFO] generation3.config.js generated for PM2."
