@@ -125,6 +125,7 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
         with open(ply_path, "rb") as f:
             buffer = f.read()
         buffer = base64.b64encode(buffer).decode("utf-8")
+        os.remove(ply_path)
         return buffer
         # response = requests.post("http://localhost:8094/validate_ply/", json={"prompt": prompt, "data": buffer})
         # end_time = time.time()
