@@ -1,20 +1,23 @@
 import torch
 import numpy as np
 import torch.nn.functional as F
+from PIL import Image
 
-
-def laplacian_filter(image: np.ndarray) -> np.ndarray:
+def laplacian_filter(image: Image.Image) -> Image.Image:
     """
     Sharpen the image using the Laplacian filter.
 
     Args:
-        image (np.ndarray): Input image array, shape (B, C, H, W) or (C, H, W).
+        image (Image.Image): Input image as a PIL Image.
 
     Returns:
-        np.ndarray: Sharpened image array, shape (B, C, H, W) or (C, H, W).
+        Image.Image: Sharpened image as a PIL Image.
     """
+    # Convert PIL Image to NumPy array
+    image_np = np.array(image).astype(np.float32).transpose(2, 0, 1)  # Convert to (C, H, W)
+
     # Convert NumPy array to PyTorch tensor
-    image_tensor = torch.from_numpy(image).float()
+    image_tensor = torch.from_numpy(image_np).float()
 
     # Add batch dimension if necessary
     if image_tensor.dim() == 3:
@@ -47,26 +50,32 @@ def laplacian_filter(image: np.ndarray) -> np.ndarray:
         sharpened_image_tensor = sharpened_image_tensor.squeeze(0)
 
     # Convert the sharpened image tensor back to a NumPy array
-    sharpened_image = sharpened_image_tensor.cpu().numpy()
+    sharpened_image_np = sharpened_image_tensor.cpu().numpy().transpose(1, 2, 0).astype(np.uint8)  # Convert to (H, W, C)
+
+    # Convert NumPy array back to PIL Image
+    sharpened_image = Image.fromarray(sharpened_image_np)
 
     return sharpened_image
 
-def unsharp_mask(image: np.ndarray, kernel_size: int = 3, sigma: float = 1.5, amount: float = 1.5, threshold: float = 0.05) -> np.ndarray:
+def unsharp_mask(image: Image.Image, kernel_size: int = 3, sigma: float = 1.5, amount: float = 1.5, threshold: float = 0.05) -> Image.Image:
     """
     Apply unsharp masking to the image.
 
     Args:
-        image (np.ndarray): Input image array, shape (B, C, H, W).
+        image (Image.Image): Input image as a PIL Image.
         kernel_size (int): Size of the Gaussian kernel.
         sigma (float): Standard deviation of the Gaussian kernel.
         amount (float): Amount of sharpening.
         threshold (float): Threshold for minimum difference.
 
     Returns:
-        np.ndarray: Sharpened image array, shape (B, C, H, W).
+        Image.Image: Sharpened image as a PIL Image.
     """
+    # Convert PIL Image to NumPy array
+    image_np = np.array(image).astype(np.float32).transpose(2, 0, 1)  # Convert to (C, H, W)
+
     # Convert NumPy array to PyTorch tensor
-    image_tensor = torch.from_numpy(image).float()
+    image_tensor = torch.from_numpy(image_np).float()
 
     if image_tensor.dim() == 3:
         image_tensor = image_tensor.unsqueeze(0)
@@ -105,6 +114,9 @@ def unsharp_mask(image: np.ndarray, kernel_size: int = 3, sigma: float = 1.5, am
         sharpened_image_tensor = sharpened_image_tensor.squeeze(0)
 
     # Convert the sharpened image tensor back to a NumPy array
-    sharpened_image = sharpened_image_tensor.cpu().numpy()
+    sharpened_image_np = sharpened_image_tensor.cpu().numpy().transpose(1, 2, 0).astype(np.uint8)  # Convert to (H, W, C)
+
+    # Convert NumPy array back to PIL Image
+    sharpened_image = Image.fromarray(sharpened_image_np)
 
     return sharpened_image

@@ -87,7 +87,7 @@ def generate_image(prompt: str):
     image = img_generator(prompt)
     end_time = time.time()
     print("Time taken to generate image:", end_time - start_time)
-    return Image.fromarray(unsharp_mask(laplacian_filter(np.array(image))))
+    return image
 
 def pack_state(gs: Gaussian) -> dict:
     return {
