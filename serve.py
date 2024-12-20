@@ -23,6 +23,7 @@ import torch
 from diffusers import HunyuanDiTPipeline
 
 from image_gen import Text2Image
+from sharpen_img import laplacian_filter, unsharp_mask
 
 # client = Together()
 
@@ -86,7 +87,7 @@ def generate_image(prompt: str):
     image = img_generator(prompt)
     end_time = time.time()
     print("Time taken to generate image:", end_time - start_time)
-    return image
+    return unsharp_mask(laplacian_filter(image))
 
 def pack_state(gs: Gaussian) -> dict:
     return {
