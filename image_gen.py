@@ -1,6 +1,6 @@
 import torch
-from .utils import seed_everything, timing_decorator, auto_amp_inference
-from .utils import get_parameter_number, set_parameter_grad_false
+from utils import seed_everything, timing_decorator, auto_amp_inference
+from utils import get_parameter_number, set_parameter_grad_false
 from diffusers import HunyuanDiTPipeline, AutoPipelineForText2Image
 
 class Text2Image():
