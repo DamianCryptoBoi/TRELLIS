@@ -30,13 +30,8 @@ from sharpen_img import laplacian_filter, unsharp_mask
 MAX_SEED = np.iinfo(np.int32).max
 
 app = FastAPI()
-# img_generator = Text2Image()
-
-pipe = HunyuanDiTPipeline.from_pretrained("Tencent-Hunyuan/HunyuanDiT-v1.2-Diffusers-Distilled", torch_dtype=torch.float16).to("cuda")
-neg_txt = "文本,特写,裁剪,出框,最差质量,低质量,JPEG伪影,PGLY,重复,病态,残缺,多余的手指,变异的手," \
-                       "画得不好的手,画得不好的脸,变异,畸形,模糊,脱水,糟糕的解剖学,糟糕的比例,多余的肢体,克隆的脸," \
-                       "毁容,恶心的比例,畸形的肢体,缺失的手臂,缺失的腿,额外的手臂,额外的腿,融合的手指,手指太多,长脖子"
-os.makedirs("/gen-data", exist_ok=True)
+img_generator = Text2Image()
+os.makedirs("/tmp", exist_ok=True)
 
 def generate_image(prompt: str):
     start_time = time.time()
@@ -89,8 +84,7 @@ def generate_image(prompt: str):
     # image_url = output
     # response = requests.get(image_url)
     # image = Image.open(BytesIO(response.content))
-    # image = img_generator(prompt)
-    image = pipe(prompt = prompt, negative_prompt=neg_txt)
+    image = img_generator(prompt)
     end_time = time.time()
     print("Time taken to generate image:", end_time - start_time)
     return image
