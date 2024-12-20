@@ -18,7 +18,6 @@ from io import BytesIO
 import requests
 from pydantic import BaseModel
 from fastapi.responses import Response, StreamingResponse
-import replicate
 
 import torch
 from diffusers import HunyuanDiTPipeline
