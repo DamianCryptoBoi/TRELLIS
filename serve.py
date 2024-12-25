@@ -28,7 +28,8 @@ from sharpen_img import laplacian_filter, unsharp_mask
 # client = Together()
 
 MAX_SEED = np.iinfo(np.int32).max
-
+pipeline = TrellisImageTo3DPipeline.from_pretrained("JeffreyXiang/TRELLIS-image-large")
+pipeline.cuda()
 app = FastAPI()
 img_generator = Text2Image()
 os.makedirs("/gen-data", exist_ok=True)
@@ -197,6 +198,4 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.68):
 
 # Launch the Gradio app
 if __name__ == "__main__":
-    pipeline = TrellisImageTo3DPipeline.from_pretrained("JeffreyXiang/TRELLIS-image-large")
-    pipeline.cuda()
     uvicorn.run(app, host="0.0.0.0", port=8093)
