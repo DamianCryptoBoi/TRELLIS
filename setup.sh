@@ -65,7 +65,7 @@ if [ "$HELP" = true ] ; then
 fi
 
 if [ "$NEW_ENV" = true ] ; then
-    conda create -f env.yml
+    conda env create -f env.yml
     conda activate trellis
     conda install pytorch==2.4.0 torchvision==0.19.0 pytorch-cuda=11.8 -c pytorch -c nvidia
 fi
