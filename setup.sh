@@ -104,7 +104,8 @@ case $PLATFORM in
 esac
 
 if [ "$BASIC" = true ] ; then
-    pip install pillow imageio imageio-ffmpeg tqdm easydict opencv-python-headless scipy ninja rembg[gpu,cli]==2.0.49 onnxruntime==1.18.0 trimesh xatlas pyvista pymeshfix igraph transformers
+    pip install pillow imageio imageio-ffmpeg tqdm easydict opencv-python-headless scipy ninja onnxruntime==1.18.0 trimesh xatlas pyvista pymeshfix igraph transformers --index-url https://download.pytorch.org/whl/cu118
+    pip install rembg[gpu,cli]==2.0.50 --no-deps
     pip install git+https://github.com/EasternJournalist/utils3d.git@9a4eb15e4021b67b12c460c7057d642626897ec8
 fi
 
