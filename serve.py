@@ -25,7 +25,7 @@ from diffusers import HunyuanDiTPipeline
 from image_gen import Text2Image
 from sharpen_img import laplacian_filter, unsharp_mask
 
-# client = Together()
+client = Together()
 
 MAX_SEED = np.iinfo(np.int32).max
 pipeline = TrellisImageTo3DPipeline.from_pretrained("JeffreyXiang/TRELLIS-image-large")
@@ -38,19 +38,19 @@ def generate_image(prompt: str):
     start_time = time.time()
     prompt = f"{prompt}, white background"
     # prompt = f"highly detailed and colorful 3d model of a {prompt}, white background"
-    # image = client.images.generate(
-    #     model="black-forest-labs/FLUX.1-schnell-Free",
-    #     width=1024,
-    #     height=1024,
-    #     steps=4,
-    #     prompt=prompt,
-    #     response_format="b64_json"
-    # )
-    # end_time = time.time()
+    image = client.images.generate(
+        model="black-forest-labs/FLUX.1-schnell-Free",
+        width=1024,
+        height=1024,
+        steps=4,
+        prompt=prompt,
+        response_format="b64_json"
+    )
+    end_time = time.time()
     
-    # print("Prompt:", prompt)
-    # print("Time taken to generate image:", end_time - start_time)
-    # return image.data[0].b64_json
+    print("Prompt:", prompt)
+    print("Time taken to generate image:", end_time - start_time)
+    return image.data[0].b64_json
 
     # output = replicate.run(
     #     "black-forest-labs/flux-dev",
@@ -85,10 +85,10 @@ def generate_image(prompt: str):
     # image_url = output
     # response = requests.get(image_url)
     # image = Image.open(BytesIO(response.content))
-    image = img_generator(prompt)
-    end_time = time.time()
-    print("Time taken to generate image:", end_time - start_time)
-    return image
+    # image = img_generator(prompt)
+    # end_time = time.time()
+    # print("Time taken to generate image:", end_time - start_time)
+    # return image
 
 def pack_state(gs: Gaussian) -> dict:
     return {
@@ -179,10 +179,10 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
 
 @app.post("/test")
 async def test(prompt: str = Form()):
-    # b64_json = generate_image(prompt)
-    # image_data = base64.b64decode(b64_json)
-    # image = Image.open(BytesIO(image_data))
-    image = generate_image(prompt)
+    b64_json = generate_image(prompt)
+    image_data = base64.b64decode(b64_json)
+    image = Image.open(BytesIO(image_data))
+    # image = generate_image(prompt)
     state = image_to_3d_test(prompt, image)
     return JSONResponse(content=state)
 
