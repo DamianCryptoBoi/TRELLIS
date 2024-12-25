@@ -41,8 +41,9 @@ class TrellisImageTo3DPipeline(Pipeline):
         self.sparse_structure_sampler_params = {}
         self.slat_sampler_params = {}
         self.slat_normalization = slat_normalization
-        self.rembg_session = None
+        self.rembg_session = rembg.new_session('u2net',['CUDAExecutionProvider'])
         self._init_image_cond_model(image_cond_model)
+        print(self.bg_remover.inner_session.get_providers())
 
     @staticmethod
     def from_pretrained(path: str) -> "TrellisImageTo3DPipeline":
@@ -98,9 +99,7 @@ class TrellisImageTo3DPipeline(Pipeline):
             max_size = max(input.size)
             scale = min(1, 1024 / max_size)
             if scale < 1:
-                input = input.resize((int(input.width * scale), int(input.height * scale)), Image.Resampling.LANCZOS)
-            if getattr(self, 'rembg_session', None) is None:
-                self.rembg_session = rembg.new_session('u2net')
+                input = input.resize((int(input.width * scale), int(input.height * scale)), Image.Resampling.LANCZOS) 
             output = rembg.remove(input, session=self.rembg_session)
         output_np = np.array(output)
         alpha = output_np[:, :, 3]
