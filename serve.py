@@ -20,7 +20,7 @@ from pydantic import BaseModel
 from fastapi.responses import Response, StreamingResponse
 
 import torch
-from diffusers import HunyuanDiTPipeline
+# from diffusers import HunyuanDiTPipeline
 
 from image_gen import Text2Image
 from sharpen_img import laplacian_filter, unsharp_mask
