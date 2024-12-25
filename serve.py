@@ -28,8 +28,8 @@ from sharpen_img import laplacian_filter, unsharp_mask
 client = Together()
 
 MAX_SEED = np.iinfo(np.int32).max
-pipeline = TrellisImageTo3DPipeline.from_pretrained("JeffreyXiang/TRELLIS-image-large")
-pipeline.cuda()
+# pipeline = TrellisImageTo3DPipeline.from_pretrained("JeffreyXiang/TRELLIS-image-large")
+# pipeline.cuda()
 app = FastAPI()
 img_generator = Text2Image()
 os.makedirs("/gen-data", exist_ok=True)
