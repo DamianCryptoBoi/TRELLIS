@@ -31,7 +31,7 @@ MAX_SEED = np.iinfo(np.int32).max
 
 app = FastAPI()
 img_generator = Text2Image()
-os.makedirs("/tmp", exist_ok=True)
+os.makedirs("/gen-data", exist_ok=True)
 
 def generate_image(prompt: str):
     start_time = time.time()
