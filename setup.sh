@@ -249,3 +249,87 @@ fi
 if [ "$DEMO" = true ] ; then
     pip install gradio==4.44.1 gradio_litmodel3d==0.0.1
 fi
+
+
+CONDA_INTERPRETER_PATH=$(which python)
+
+# Generate the generation.config.js file for PM2 with specified configurations
+cat <<EOF > generation0.config.js
+module.exports = {
+  apps : [{
+    name: 'generation0',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8093 --v_port 8094',
+    env: {
+        CUDA_VISIBLE_DEVICES: "0"
+    }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation0.config.js generated for PM2."
+
+cat <<EOF > generation1.config.js
+module.exports = {
+  apps : [{
+    name: 'generation1',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8193 --v_port 8194',
+    env: {
+        CUDA_VISIBLE_DEVICES: "1"
+      }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation1.config.js generated for PM2."
+
+
+cat <<EOF > generation2.config.js
+module.exports = {
+  apps : [{
+    name: 'generation2',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8293 --v_port 8294',
+    env: {
+        CUDA_VISIBLE_DEVICES: "2"
+      }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation2.config.js generated for PM2."
+
+
+cat <<EOF > generation3.config.js
+module.exports = {
+  apps : [{
+    name: 'generation3',
+    script: 'serve.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+    args: '--port 8393 --v_port 8394',
+    env: {
+        CUDA_VISIBLE_DEVICES: "3"
+      }
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] generation3.config.js generated for PM2."
+
+
+
+cat <<EOF > router.config.js
+module.exports = {
+  apps : [{
+    name: 'router',
+    script: 'router.py',
+    interpreter: '${CONDA_INTERPRETER_PATH}',
+  }]
+};
+EOF
+
+echo -e "\n\n[INFO] router.config.js generated for PM2."
