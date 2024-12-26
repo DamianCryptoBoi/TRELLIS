@@ -319,17 +319,3 @@ module.exports = {
 EOF
 
 echo -e "\n\n[INFO] generation3.config.js generated for PM2."
-
-
-
-cat <<EOF > router.config.js
-module.exports = {
-  apps : [{
-    name: 'router',
-    script: 'router.py',
-    interpreter: '${CONDA_INTERPRETER_PATH}',
-  }]
-};
-EOF
-
-echo -e "\n\n[INFO] router.config.js generated for PM2."

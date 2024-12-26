@@ -49,7 +49,9 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
         while count < args.retry:
             count += 1
             async with httpx.AsyncClient(follow_redirects=True) as client:
-                response = await client.post(router.get_endpoint(), data=data, timeout=100)
+                endpoint = router.get_endpoint()
+                print(f"Requesting from {endpoint}")
+                response = await client.post(endpoint, data=data, timeout=100)
             ply_path = response.text
             if len(ply_path)>0 and os.path.exists(ply_path):
                 with open(ply_path, "rb") as f:
