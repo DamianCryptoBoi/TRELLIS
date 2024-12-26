@@ -24,6 +24,16 @@ import torch
 
 # from image_gen import Text2Image
 from sharpen_img import laplacian_filter, unsharp_mask
+import argparse
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default=8093)
+    parser.add_argument("--v_port", type=int, default=8094)
+    return parser.parse_args()
+
+
+args = get_args()
 
 client = Together()
 
@@ -36,7 +46,7 @@ os.makedirs("/gen-data", exist_ok=True)
 
 def generate_image(prompt: str):
     start_time = time.time()
-    prompt = f"{prompt}, white background"
+    prompt = f"{prompt}, white background, 3D style, high quality"
     # prompt = f"highly detailed and colorful 3d model of a {prompt}, white background"
     image = client.images.generate(
         model="black-forest-labs/FLUX.1-schnell-Free",
@@ -136,7 +146,7 @@ def image_to_3d_test(prompt: str, image: Image.Image, ss_guidance_strength: floa
     os.remove(ply_path)
     return score
 
-def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.68, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
+def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
     start_time = time.time()
     count = 0
 
@@ -163,18 +173,20 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
         with open(ply_path, "rb") as f:
             buffer = f.read()
         buffer = base64.b64encode(buffer).decode("utf-8")
-        os.remove(ply_path)
-        return buffer
-        # response = requests.post("http://localhost:8094/validate_ply/", json={"prompt": prompt, "data": buffer})
-        # end_time = time.time()
-        # score = response.json().get("score", 0)
-        # print("prompt:", prompt)
-        # print(response.json())
-        # print("Time taken to convert image to 3D:", end_time - start_time)
-        # # remove the ply file
-        # if score >= validation_threshold:
-        #     return buffer
-        # count += 1
+        # return buffer
+        response = requests.post(f"http://localhost:{args.v_port}/validate_ply/", json={"prompt": prompt, "data": buffer})
+        end_time = time.time()
+        score = response.json().get("score", 0)
+        print("prompt:", prompt)
+        print(response.json())
+        print("Time taken to convert image to 3D:", end_time - start_time)
+        # remove the ply file
+        # os.remove(ply_path)
+        if score >= validation_threshold:
+            return ply_path
+        else:
+            os.remove(ply_path)
+        count += 1
     return ''
 
 @app.post("/test")
@@ -193,9 +205,9 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.68):
     # image_data = base64.b64decode(b64_json)
     # image = Image.open(BytesIO(image_data))
     image = generate_image(prompt)
-    buffer = image_to_3d(prompt, image, validation_threshold)
-    return Response(buffer, media_type="application/octet-stream")
+    ply_path = image_to_3d(prompt, image, validation_threshold)
+    return ply_path
 
 # Launch the Gradio app
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8093)
+    uvicorn.run(app, host="0.0.0.0", port=args.port)
