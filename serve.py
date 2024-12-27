@@ -114,43 +114,8 @@ def pack_state(gs: Gaussian) -> dict:
 
 
 def image_to_3d_test(prompt: str, image: Image.Image, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
-    start_time = time.time()
-    seed = np.random.randint(0, MAX_SEED)
-    outputs = pipeline.run(
-        image,
-        seed=seed,
-        formats=["gaussian"],
-        preprocess_image=True,
-        sparse_structure_sampler_params={
-            "steps": ss_sampling_steps,
-            "cfg_strength": ss_guidance_strength,
-        },
-        slat_sampler_params={
-            "steps": slat_sampling_steps,
-            "cfg_strength": slat_guidance_strength,
-        },
-    )
-    ply_path = f"./gen-data/{seed}.ply"
-    outputs['gaussian'][0].save_ply(ply_path)
-    print("Ply file saved at:", ply_path)
-    #read the ply file
-    with open(ply_path, "rb") as f:
-        buffer = f.read()
-    buffer = base64.b64encode(buffer).decode("utf-8")
-    response = requests.post("http://localhost:8094/validate_ply/", json={"prompt": prompt, "data": buffer})
-    end_time = time.time()
-    score = response.json().get("score", 0)
-    print(response.json())
-    print("Time taken to convert image to 3D:", end_time - start_time)
-    # remove the ply file
-    os.remove(ply_path)
-    return score
-
-def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
-    start_time = time.time()
-    count = 0
-
-    while count < 1:
+    try:
+        start_time = time.time()
         seed = np.random.randint(0, MAX_SEED)
         outputs = pipeline.run(
             image,
@@ -173,21 +138,64 @@ def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6
         with open(ply_path, "rb") as f:
             buffer = f.read()
         buffer = base64.b64encode(buffer).decode("utf-8")
-        # return buffer
-        response = requests.post(f"http://localhost:{args.v_port}/validate_ply/", json={"prompt": prompt, "data": buffer})
+        response = requests.post("http://localhost:8094/validate_ply/", json={"prompt": prompt, "data": buffer})
         end_time = time.time()
         score = response.json().get("score", 0)
-        print("prompt:", prompt)
         print(response.json())
         print("Time taken to convert image to 3D:", end_time - start_time)
         # remove the ply file
-        # os.remove(ply_path)
-        if score >= validation_threshold:
-            return ply_path
-        else:
-            os.remove(ply_path)
-        count += 1
-    return ''
+        os.remove(ply_path)
+        return score
+    except Exception as e:
+        print(f"Error: {e}")
+        return 0
+
+def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
+    start_time = time.time()
+    count = 0
+
+    try:
+        while count < 1:
+            seed = np.random.randint(0, MAX_SEED)
+            outputs = pipeline.run(
+                image,
+                seed=seed,
+                formats=["gaussian"],
+                preprocess_image=True,
+                sparse_structure_sampler_params={
+                    "steps": ss_sampling_steps,
+                    "cfg_strength": ss_guidance_strength,
+                },
+                slat_sampler_params={
+                    "steps": slat_sampling_steps,
+                    "cfg_strength": slat_guidance_strength,
+                },
+            )
+            ply_path = f"./gen-data/{seed}.ply"
+            outputs['gaussian'][0].save_ply(ply_path)
+            print("Ply file saved at:", ply_path)
+            #read the ply file
+            with open(ply_path, "rb") as f:
+                buffer = f.read()
+            buffer = base64.b64encode(buffer).decode("utf-8")
+            # return buffer
+            response = requests.post(f"http://localhost:{args.v_port}/validate_ply/", json={"prompt": prompt, "data": buffer})
+            end_time = time.time()
+            score = response.json().get("score", 0)
+            print("prompt:", prompt)
+            print(response.json())
+            print("Time taken to convert image to 3D:", end_time - start_time)
+            # remove the ply file
+            # os.remove(ply_path)
+            if score >= validation_threshold:
+                return ply_path
+            else:
+                os.remove(ply_path)
+            count += 1
+        return ''
+    except Exception as e:
+        print(f"Error: {e}")
+        return ''
 
 @app.post("/test")
 async def test(prompt: str = Form()):
