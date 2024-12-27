@@ -195,10 +195,10 @@ def image_to_3d(prompt: str, validation_threshold: int = 0.6, ss_guidance_streng
             else:
                 os.remove(ply_path)
             count += 1
-        return {"ply_path":"", "score":0}
+        return '', 0
     except Exception as e:
         print(f"Error: {e}")
-        return ''
+        return '', 0
 
 @app.post("/test")
 async def test(prompt: str = Form()):
