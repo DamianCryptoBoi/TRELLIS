@@ -60,8 +60,9 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
                 print(f"Requesting from {endpoint}")
                 response = await client.post(endpoint, data=data, timeout=100)
                 data = response.json()
-            ply_path = data.get("ply_path")
-            score = data.get("score")
+                print(data)
+            ply_path = data.get("ply_path","")
+            score = data.get("score",0)
             ply_path_list.append(ply_path)
             if score >= validation_threshold and os.path.exists(ply_path):
                 if score > best_score:

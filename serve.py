@@ -191,8 +191,7 @@ def image_to_3d(prompt: str, validation_threshold: int = 0.6, ss_guidance_streng
             # remove the ply file
             # os.remove(ply_path)
             if score >= validation_threshold:
-                return {"ply_path":ply_path,"score":score
-        }
+                return ply_path, score
             else:
                 os.remove(ply_path)
             count += 1
@@ -214,7 +213,7 @@ async def test(prompt: str = Form()):
 @app.post("/generate/")
 async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
     data = image_to_3d(prompt, validation_threshold)
-    return JSONResponse(content=data)
+    return JSONResponse(content={"ply_path":data[0], "score":data[1]})
 
 # Launch the Gradio app
 if __name__ == "__main__":
