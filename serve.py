@@ -49,7 +49,7 @@ def generate_image(prompt: str):
     prompt = f"{prompt}, white background, 3D style, high quality"
     # prompt = f"highly detailed and colorful 3d model of a {prompt}, white background"
     image = client.images.generate(
-        model="black-forest-labs/FLUX.1-schnell-Free",
+        model="black-forest-labs/FLUX.1-schnell",
         width=1024,
         height=1024,
         steps=4,
