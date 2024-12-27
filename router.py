@@ -29,7 +29,7 @@ class Router():
     def get_endpoint(self, test=False):
         if test:
             print("get test endpoint")
-            endpoint = f'{self.base_url}:{self.validation_ports[self.next_index]}/test'
+            endpoint = f'{self.base_url}:{self.generation_ports[self.next_index]}/test'
         endpoint = f'{self.base_url}:{self.generation_ports[self.next_index]}/generate/'
         self.next_index = (self.next_index + 1) % len(self.generation_ports)
         return endpoint
