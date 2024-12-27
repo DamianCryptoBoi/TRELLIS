@@ -76,7 +76,8 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
             buffer = f.read()
         buffer = base64.b64encode(buffer).decode("utf-8")
         for ply_path in ply_path_list:
-            os.remove(ply_path)
+            if os.path.exists(ply_path):
+                os.remove(ply_path)
         return Response(buffer, media_type="application/octet-stream")
     except Exception as e:
         print(f"Error: {e}")
