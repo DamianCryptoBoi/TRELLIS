@@ -203,8 +203,8 @@ async def test(prompt: str = Form()):
     image_data = base64.b64decode(b64_json)
     image = Image.open(BytesIO(image_data))
     # image = generate_image(prompt)
-    state = image_to_3d_test(prompt, image)
-    return JSONResponse(content=state)
+    score = image_to_3d_test(prompt, image)
+    return JSONResponse(content={"score":score})
 
 
 @app.post("/generate/")
@@ -214,7 +214,7 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.68):
     # image = Image.open(BytesIO(image_data))
     image = generate_image(prompt)
     ply_path = image_to_3d(prompt, image, validation_threshold)
-    return ply_path
+    return JSONResponse(content={"ply_path": ply_path})
 
 # Launch the Gradio app
 if __name__ == "__main__":

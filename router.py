@@ -52,7 +52,7 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
                 endpoint = router.get_endpoint()
                 print(f"Requesting from {endpoint}")
                 response = await client.post(endpoint, data=data, timeout=100)
-            ply_path = response.text
+            ply_path = response.json().get("ply_path")
             if len(ply_path)>0 and os.path.exists(ply_path):
                 with open(ply_path, "rb") as f:
                     buffer = f.read()
@@ -79,7 +79,7 @@ async def test(prompt: str = Form(), validation_threshold: float = 0.6):
             endpoint = router.get_endpoint()
             print(f"Requesting from {endpoint}")
             response = await client.post(endpoint, data=data, timeout=100)
-            return  response.text
+            return  response.json().get("score",0)
     except Exception as e:
         print(f"Error: {e}")
         return ""
