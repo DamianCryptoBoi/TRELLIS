@@ -26,7 +26,9 @@ class Router():
         self.next_index = 0
         print("Router initialized")
         print("Generation ports:", self.generation_ports)
-    def get_endpoint(self):
+    def get_endpoint(self, test=False):
+        if test:
+            endpoint = f'{self.base_url}:{self.validation_ports[self.next_index]}/test'
         endpoint = f'{self.base_url}:{self.generation_ports[self.next_index]}/generate/'
         self.next_index = (self.next_index + 1) % len(self.generation_ports)
         return endpoint
