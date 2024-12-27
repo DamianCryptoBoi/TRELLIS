@@ -78,7 +78,7 @@ async def test(prompt: str = Form(), validation_threshold: float = 0.6):
     
     try:
         async with httpx.AsyncClient(follow_redirects=True) as client:
-            endpoint = router.get_endpoint()
+            endpoint = router.get_endpoint(test=True)
             print(f"Requesting from {endpoint}")
             response = await client.post(endpoint, data=data, timeout=100)
             return  response.json().get("score",0)
