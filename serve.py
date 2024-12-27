@@ -150,7 +150,7 @@ def image_to_3d_test(prompt: str, image: Image.Image, ss_guidance_strength: floa
         print(f"Error: {e}")
         return 0
 
-def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
+def image_to_3d(prompt: str, validation_threshold: int = 0.6, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
     start_time = time.time()
     count = 0
     try:
