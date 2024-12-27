@@ -101,8 +101,7 @@ class TrellisImageTo3DPipeline(Pipeline):
                 input = input.resize((int(input.width * scale), int(input.height * scale)), Image.Resampling.LANCZOS)
             if getattr(self, 'rembg_session', None) is None:
                 self.rembg_session = rembg.new_session('u2net',['CUDAExecutionProvider'])
-                print('rembg session created')
-                print(self.rembg_session.inner_session.get_providers())
+
             output = rembg.remove(input, session=self.rembg_session)
         output_np = np.array(output)
         alpha = output_np[:, :, 3]
@@ -137,11 +136,11 @@ class TrellisImageTo3DPipeline(Pipeline):
             image = [i.resize((518, 518), Image.LANCZOS) for i in image]
             image = [np.array(i.convert('RGB')).astype(np.float32) / 255 for i in image]
             image = [torch.from_numpy(i).permute(2, 0, 1).float() for i in image]
-            image = torch.stack(image).to('cuda')
+            image = torch.stack(image).to(self.device)
         else:
             raise ValueError(f"Unsupported type of image: {type(image)}")
         
-        image = self.image_cond_model_transform(image).to('cuda')
+        image = self.image_cond_model_transform(image).to(self.device)
         features = self.models['image_cond_model'](image, is_training=True)['x_prenorm']
         patchtokens = F.layer_norm(features, features.shape[-1:])
         return patchtokens
@@ -180,7 +179,7 @@ class TrellisImageTo3DPipeline(Pipeline):
         # Sample occupancy latent
         flow_model = self.models['sparse_structure_flow_model']
         reso = flow_model.resolution
-        noise = torch.randn(num_samples, flow_model.in_channels, reso, reso, reso).to('cuda')
+        noise = torch.randn(num_samples, flow_model.in_channels, reso, reso, reso).to(self.device)
         sampler_params = {**self.sparse_structure_sampler_params, **sampler_params}
         z_s = self.sparse_structure_sampler.sample(
             flow_model,
@@ -237,7 +236,7 @@ class TrellisImageTo3DPipeline(Pipeline):
         # Sample structured latent
         flow_model = self.models['slat_flow_model']
         noise = sp.SparseTensor(
-            feats=torch.randn(coords.shape[0], flow_model.in_channels).to('cuda'),
+            feats=torch.randn(coords.shape[0], flow_model.in_channels).to(self.device),
             coords=coords,
         )
         sampler_params = {**self.slat_sampler_params, **sampler_params}
