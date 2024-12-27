@@ -43,7 +43,7 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
     print(f"prompt: " + prompt)
     print(f"validation_threshold: " + str(validation_threshold))
 
-    data = {
+    req_data = {
         "prompt": prompt,
         "validation_threshold": validation_threshold
     }
@@ -58,7 +58,7 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
             async with httpx.AsyncClient(follow_redirects=True) as client:
                 endpoint = router.get_endpoint()
                 print(f"Requesting from {endpoint}")
-                response = await client.post(endpoint, data=data, timeout=100)
+                response = await client.post(endpoint, data=req_data, timeout=100)
                 data = response.json()
                 print(data)
             ply_path = data.get("ply_path","")
