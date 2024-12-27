@@ -208,7 +208,7 @@ async def test(prompt: str = Form()):
 
 
 @app.post("/generate/")
-async def generate(prompt: str = Form(), validation_threshold: float = 0.68):
+async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
     # b64_json = generate_image(prompt)
     # image_data = base64.b64decode(b64_json)
     # image = Image.open(BytesIO(image_data))
