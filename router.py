@@ -34,7 +34,7 @@ class Router():
 router = Router()
 
 app = FastAPI()
-@app.post("/generate")
+@app.post("/generate/")
 async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
     print(f"prompt: " + prompt)
     print(f"validation_threshold: " + str(validation_threshold))
@@ -60,6 +60,26 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
                 os.remove(ply_path)
                 return Response(buffer, media_type="application/octet-stream")
         return ""
+    except Exception as e:
+        print(f"Error: {e}")
+        return ""
+    
+@app.post("/test")
+async def test(prompt: str = Form(), validation_threshold: float = 0.6):
+    print(f"prompt: " + prompt)
+    print(f"validation_threshold: " + str(validation_threshold))
+
+    data = {
+        "prompt": prompt,
+        "validation_threshold": validation_threshold
+    }
+    
+    try:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            endpoint = router.get_endpoint()
+            print(f"Requesting from {endpoint}")
+            response = await client.post(endpoint, data=data, timeout=100)
+            return  response.text
     except Exception as e:
         print(f"Error: {e}")
         return ""
