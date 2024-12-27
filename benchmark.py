@@ -26,7 +26,7 @@ for prompt in prompts:
     total_runs += 1
     print(f"Prompt: {prompt.strip()}")
     try:
-        gen_response = requests.post("http://localhost:8093/test/", data={
+        gen_response = requests.post("http://localhost:8999/test", data={
             "prompt": prompt.strip(),
         }, timeout=600)
         score = float(gen_response.text)
