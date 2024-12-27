@@ -153,9 +153,9 @@ def image_to_3d_test(prompt: str, image: Image.Image, ss_guidance_strength: floa
 def image_to_3d(prompt: str, image: Image.Image, validation_threshold: int = 0.6, ss_guidance_strength: float = 7.5, ss_sampling_steps: int = 12, slat_guidance_strength: float = 3, slat_sampling_steps: int = 12) -> Tuple[dict, str]:
     start_time = time.time()
     count = 0
-
     try:
         while count < 1:
+            image = generate_image(prompt)
             seed = np.random.randint(0, MAX_SEED)
             outputs = pipeline.run(
                 image,
@@ -212,8 +212,8 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
     # b64_json = generate_image(prompt)
     # image_data = base64.b64decode(b64_json)
     # image = Image.open(BytesIO(image_data))
-    image = generate_image(prompt)
-    ply_path = image_to_3d(prompt, image, validation_threshold)
+    
+    ply_path = image_to_3d(prompt, validation_threshold)
     return JSONResponse(content={"ply_path": ply_path})
 
 # Launch the Gradio app
