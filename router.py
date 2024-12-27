@@ -50,20 +50,33 @@ async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
     
     try:
         count = 0
+        ply_path_list = []
+        best_ply_path = ""
+        best_score = 0
         while count < args.retry:
             count += 1
             async with httpx.AsyncClient(follow_redirects=True) as client:
                 endpoint = router.get_endpoint()
                 print(f"Requesting from {endpoint}")
                 response = await client.post(endpoint, data=data, timeout=100)
-            ply_path = response.json().get("ply_path")
-            if len(ply_path)>0 and os.path.exists(ply_path):
-                with open(ply_path, "rb") as f:
-                    buffer = f.read()
-                buffer = base64.b64encode(buffer).decode("utf-8")
-                os.remove(ply_path)
-                return Response(buffer, media_type="application/octet-stream")
-        return ""
+                data = response.json()
+            ply_path = data.get("ply_path")
+            score = data.get("score")
+            ply_path_list.append(ply_path)
+            if score >= validation_threshold and os.path.exists(ply_path):
+                if score > best_score:
+                    best_score = score
+                    best_ply_path = ply_path
+                    print(f"Best score: {best_score}")
+                    if score >=0.8:
+                        print("Found a good ply. Stopping the loop.")
+                        break
+        with open(best_ply_path, "rb") as f:
+            buffer = f.read()
+        buffer = base64.b64encode(buffer).decode("utf-8")
+        for ply_path in ply_path_list:
+            os.remove(ply_path)
+        return Response(buffer, media_type="application/octet-stream")
     except Exception as e:
         print(f"Error: {e}")
         return ""
