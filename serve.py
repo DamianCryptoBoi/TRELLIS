@@ -155,7 +155,10 @@ def image_to_3d(prompt: str, validation_threshold: int = 0.6, ss_guidance_streng
     count = 0
     try:
         while count < 1:
-            image = generate_image(prompt)
+
+            b64_json = generate_image(prompt)
+            image_data = base64.b64decode(b64_json)
+            image = Image.open(BytesIO(image_data))
             seed = np.random.randint(0, MAX_SEED)
             outputs = pipeline.run(
                 image,
@@ -209,10 +212,6 @@ async def test(prompt: str = Form()):
 
 @app.post("/generate/")
 async def generate(prompt: str = Form(), validation_threshold: float = 0.6):
-    # b64_json = generate_image(prompt)
-    # image_data = base64.b64decode(b64_json)
-    # image = Image.open(BytesIO(image_data))
-    
     ply_path = image_to_3d(prompt, validation_threshold)
     return JSONResponse(content={"ply_path": ply_path})
 
