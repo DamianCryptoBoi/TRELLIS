@@ -54,6 +54,22 @@ def sharpen_image(image: Image.Image, radius: float = 2.0, percent: float = 150,
     """Apply unsharp mask to the image to make it sharper"""
     return image.filter(ImageFilter.UnsharpMask(radius=radius, percent=percent, threshold=threshold))
 
+def laplacian_filter(image: Image.Image) -> Image.Image:
+    """Apply Laplacian filter to the image to make it sharper"""
+    image_np = np.array(image)
+    laplacian = cv2.Laplacian(image_np, cv2.CV_64F)
+    sharpened_image_np = cv2.convertScaleAbs(image_np - laplacian)
+    sharpened_image = Image.fromarray(sharpened_image_np)
+    return sharpened_image
+
+def high_pass_filter(image: Image.Image, radius: int = 30) -> Image.Image:
+    """Apply High-Pass filter to the image to make it sharper"""
+    image_np = np.array(image)
+    blurred = cv2.GaussianBlur(image_np, (radius, radius), 0)
+    high_pass = cv2.addWeighted(image_np, 1.5, blurred, -0.5, 0)
+    sharpened_image = Image.fromarray(high_pass)
+    return sharpened_image
+
 def generate_flux_image(
     prompt: str,
 ) -> Image.Image:
@@ -70,7 +86,7 @@ def generate_flux_image(
         generator=generator,
     ).images[0]
     
-    return sharpen_image(image)
+    return high_pass_filter(laplacian_filter(sharpen_image(image)))
 
 def generate_image(prompt: str):
     start_time = time.time()
