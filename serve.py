@@ -54,10 +54,6 @@ flux_pipeline = flux_model.get_pipeline()
 
 def generate_flux_image(
     prompt: str,
-
-    width: int,
-    height: int,
-    guidance_scale: float,
 ) -> Image.Image:
     """Generate image using Flux pipeline"""
     seed = random.randint(0, MAX_SEED)
@@ -235,7 +231,7 @@ async def test(prompt: str = Form()):
     # b64_json = generate_image(prompt)
     # image_data = base64.b64decode(b64_json)
     # image = Image.open(BytesIO(image_data))
-    image = generate_image(prompt)
+    image = generate_flux_image(prompt)
     score = image_to_3d_test(prompt, image)
     return JSONResponse(content={"score":score})
 
