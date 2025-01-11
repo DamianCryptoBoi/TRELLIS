@@ -25,6 +25,8 @@ import torch
 # from image_gen import Text2Image
 from sharpen_img import laplacian_filter, unsharp_mask
 import argparse
+import random
+from flux import FluxModel
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -43,6 +45,34 @@ pipeline.cuda()
 app = FastAPI()
 # img_generator = Text2Image()
 os.makedirs("/gen-data", exist_ok=True)
+
+flux_model = FluxModel()
+flux_pipeline = flux_model.get_pipeline()
+
+
+
+
+def generate_flux_image(
+    prompt: str,
+
+    width: int,
+    height: int,
+    guidance_scale: float,
+) -> Image.Image:
+    """Generate image using Flux pipeline"""
+    seed = random.randint(0, MAX_SEED)
+    generator = torch.Generator(device="cuda").manual_seed(seed)
+    prompt = "wbgmsst, " + prompt + ", 3D isometric, white background"
+    image = flux_pipeline(
+        prompt=prompt,
+        guidance_scale=7.5,
+        num_inference_steps=8,
+        width=1024,
+        height=1024,
+        generator=generator,
+    ).images[0]
+    
+    return image
 
 def generate_image(prompt: str):
     start_time = time.time()
@@ -202,10 +232,10 @@ def image_to_3d(prompt: str, validation_threshold: int = 0.6, ss_guidance_streng
 
 @app.post("/test")
 async def test(prompt: str = Form()):
-    b64_json = generate_image(prompt)
-    image_data = base64.b64decode(b64_json)
-    image = Image.open(BytesIO(image_data))
-    # image = generate_image(prompt)
+    # b64_json = generate_image(prompt)
+    # image_data = base64.b64decode(b64_json)
+    # image = Image.open(BytesIO(image_data))
+    image = generate_image(prompt)
     score = image_to_3d_test(prompt, image)
     return JSONResponse(content={"score":score})
 
