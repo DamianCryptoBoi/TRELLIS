@@ -86,7 +86,7 @@ def generate_flux_image(
         generator=generator,
     ).images[0]
     
-    return laplacian_filter(sharpen_image(image))
+    return image
 
 def generate_image(prompt: str):
     start_time = time.time()
@@ -246,10 +246,10 @@ def image_to_3d(prompt: str, validation_threshold: int = 0.6, ss_guidance_streng
 
 @app.post("/test")
 async def test(prompt: str = Form()):
-    # b64_json = generate_image(prompt)
-    # image_data = base64.b64decode(b64_json)
-    # image = Image.open(BytesIO(image_data))
-    image = generate_flux_image(prompt)
+    b64_json = generate_image(prompt)
+    image_data = base64.b64decode(b64_json)
+    image = Image.open(BytesIO(image_data))
+    # image = generate_flux_image(prompt)
     score = image_to_3d_test(prompt, image)
     return JSONResponse(content={"score":score})
 
