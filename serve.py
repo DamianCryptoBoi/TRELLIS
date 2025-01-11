@@ -58,13 +58,13 @@ def generate_flux_image(
     """Generate image using Flux pipeline"""
     seed = random.randint(0, MAX_SEED)
     generator = torch.Generator(device="cuda").manual_seed(seed)
-    prompt = "wbgmsst, " + prompt + ", 3D style, white background, ultra sharp, high quality"
+    prompt = "wbgmsst, " + prompt + ", 3D isometric, white background"
     image = flux_pipeline(
         prompt=prompt,
         guidance_scale=7.5,
         num_inference_steps=8,
-        width=512,
-        height=512,
+        width=2048,
+        height=2048,
         generator=generator,
     ).images[0]
     
