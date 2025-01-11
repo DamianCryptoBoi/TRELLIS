@@ -4,7 +4,7 @@ import os
 from typing import *
 import numpy as np
 from easydict import EasyDict as edict
-from PIL import Image
+from PIL import Image,ImageFilter
 from trellis.pipelines import TrellisImageTo3DPipeline
 from trellis.representations import Gaussian, MeshExtractResult
 from trellis.utils import render_utils, postprocessing_utils
@@ -20,10 +20,10 @@ from pydantic import BaseModel
 from fastapi.responses import Response, StreamingResponse
 
 import torch
+import cv2
 # from diffusers import HunyuanDiTPipeline
 
 # from image_gen import Text2Image
-from sharpen_img import laplacian_filter, unsharp_mask
 import argparse
 import random
 from flux import FluxModel
@@ -50,7 +50,9 @@ flux_model = FluxModel()
 flux_pipeline = flux_model.get_pipeline()
 
 
-
+def sharpen_image(image: Image.Image, radius: float = 2.0, percent: float = 150, threshold: int = 3) -> Image.Image:
+    """Apply unsharp mask to the image to make it sharper"""
+    return image.filter(ImageFilter.UnsharpMask(radius=radius, percent=percent, threshold=threshold))
 
 def generate_flux_image(
     prompt: str,
@@ -63,12 +65,12 @@ def generate_flux_image(
         prompt=prompt,
         guidance_scale=7.5,
         num_inference_steps=8,
-        width=2048,
-        height=2048,
+        width=1024,
+        height=1024,
         generator=generator,
     ).images[0]
     
-    return image
+    return sharpen_image(image)
 
 def generate_image(prompt: str):
     start_time = time.time()
